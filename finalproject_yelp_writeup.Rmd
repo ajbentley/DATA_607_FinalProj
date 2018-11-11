@@ -1,0 +1,159 @@
+---
+title: "DATA 607 - Final Project - Food World Cup Recommender System"
+author: "Alexander Niculescu, Joshua Bentley, and Kevin Benson"
+date: "December xx, 2018"
+output: 
+    html_document:
+        toc: TRUE
+        toc_float: TRUE
+        theme: lumen
+        number_sections: TRUE
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+what, why, motivation
+
+# Other sections
+
+description of dataset, setup
+
+# Recommender system: food types
+
+recommender system for food world cup
+
+# Exploratory data analysis
+
+some interesting analysis, graphics
+
+# Restaurant suggestions
+
+## Contruct the wrapper function
+
+Once we have the recommended cuisine type and location, the next step is to suggest several restaurants meeting these criteria.  We do this by constructing a wrapper function to access the Yelp Fusion API <https://www.yelp.com/developers/documentation/v3/get_started>.  The wrapper function will return up to 5 restaurants, together with address and other useful information, as provided by the Yelp API.
+
+To start with, we load the `httr` package to access the API and the `jsonlite` package to parse the JSON data returned.  Also, for communicating with the API, we use the API key from a saved environment variable and set up a user-agent string.
+
+```{r message = FALSE}
+library(httr)
+library(jsonlite)
+library(dplyr)
+library(stringr)
+library(knitr)
+
+# get api key from environment variable
+key <- Sys.getenv("yelp_api_key")
+api_key <- paste("Bearer", key)
+# set user agent for good practice
+ua <- user_agent(paste("kecbenson@gmail.com", R.version$platform, R.version$version.string))
+```
+
+Next, we define `getRestaurants` as a function of several inputs.  Some brief comments on the code below:
+
+* A. Validate input values for `search` and `where`, and return an error message in case of invalid inputs.  
+* B. Next define the query list based on the input values, and send the `GET` request (with the API key in the `Authorization` header) to the API.
+* C. Use `fromJSON` to parse the JSON data from the API and return a list object.  Note that we set the `flatten` argument to TRUE, since the dataframe we want has embedded lists in a few columns.
+* D. Provide error handling in case the API returns an error.
+* E. The dataframe we want is in the `businesses` item in the parsed list, so extract it and then select useful columns to display.  We rename the columns and then return the dataframe.
+
+```{r}
+getRestaurants <- function(search = NULL, where = NULL) {
+    # A. check valid inputs
+    if (!is.character(search) | !is.character(where)) {
+        stop("Invalid inputs.\nEnter a cuisine type and location (city, neighborhood, or zip code).")
+    }
+    
+    # B. define url & query list and send GET request 
+    url <- "https://api.yelp.com/v3/businesses/search"
+    query_list <- list(term = search, 
+                       location = where,
+                       limit = 5
+                       ) 
+    resp <- GET(url, add_headers(Authorization = api_key), query = query_list, ua) 
+
+    # C. parse JSON data into list, flatten nested lists
+    parsed <- fromJSON(content(resp, as = "text", encoding = "UTF-8" ), flatten = TRUE)
+
+    # D. provide API error handling 
+    if (http_error(resp)) {
+        stop(
+            sprintf(
+                "Failed request to Yelp Fusion API\n[%s] %s: %s",
+                status_code(resp),
+                parsed[[1]]$code,
+                parsed[[1]]$description
+            ),
+            call. = FALSE
+        )
+    }
+
+    # E. pass businesses list item to dataframe and select & rename columns   
+    df <- parsed$businesses %>% select(Name = name, 
+                                       Rating = rating,
+                                       Reviews = review_count,
+                                       Price = price,
+                                       Address = location.display_address,
+                                       Phone = display_phone,
+                                       Website = url
+        )
+    
+    return(df)
+}
+```
+
+## Test the wrapper function
+
+First let's test the validation of the function arguments.
+
+```{r error = TRUE}
+# test input validation
+getRestaurants()
+getRestaurants(search = NULL, where = "10021")
+getRestaurants(search = "steak", where = NA)
+```
+
+Next let's test the handling of API error messages.
+
+```{r error = TRUE}
+# test API error handling (e.g., no API key)
+api_key <- "abc"
+getRestaurants("seafood", "10021")
+```
+
+Now let's do a sample search and confirm the result is a valid dataframe.
+
+```{r error = TRUE}
+# re-set API key
+api_key <- paste("Bearer", key)
+
+# search restaurants & confirm result is a valid dataframe
+df_test <- getRestaurants("seafood", "10021") 
+str(df_test)
+kable(df_test, caption = "Seafood in 10021")
+```
+
+## Show sample output
+
+Finally let's show some sample output.
+
+``` {r cache = FALSE}
+# search steakhouses in brooklyn
+getRestaurants("steakhouse", "brooklyn")
+
+# search indian in san diego
+getRestaurants("indian", "san diego")
+```
+
+# Integrate the recommender system with restaurant suggestions
+
+# Conclusion
+
+## Findings
+
+## Suggestions for further work
+
+
