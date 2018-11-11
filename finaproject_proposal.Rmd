@@ -1,0 +1,37 @@
+---
+title: "DATA 607 - Final Project Proposal"
+author: "Alexander Niculescu, Joshua Bentley, Kevin Benson"
+date: "November 11, 2018"
+output: 
+    html_document:
+        theme: lumen
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Objective
+
+Our team's goal is to create a restaurant recommender system utilizing data from (a) the "Food World Cup" data set from FiveThirtyEight and (b) a web API from Yelp.  
+
+### Data sources
+
+This project will rely on two data sources:
+
+* The "Food World Cup" data set (<https://github.com/fivethirtyeight/data/tree/master/food-world-cup>), which includes responses to a poll asking for ratings on different national cuisines, along with demographic data from the respondents.   
+
+* The "Yelp Fusion API" (<https://www.yelp.com/developers/documentation/v3>)", which provides a restaurant search capability based on various query terms (including key words and location).
+
+### Project deliverable
+
+Our deliverable for the project will be a shiny app that will provide a recommended cuisine along with suggested restaurants nearby, based on user input such as personal information (including location) and food preferences.
+
+### Motivation
+
+Our motivation for pursuing this project is twofold:
+
+* To tackle a challenge that will require using different skills developed throughout this course
+* To create a product that will be a portfolio-ready demonstration of our abilities.
+
+Finally, we all enjoy thinking about food and discovering new cuisines that we might be missing out on.
