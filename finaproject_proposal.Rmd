@@ -15,9 +15,10 @@ Our team's goal is to create a restaurant recommender system utilizing data from
 
 This project will rely on two data sources:
 
-* The "Food World Cup" data set (<https://github.com/fivethirtyeight/data/tree/master/food-world-cup>), which includes responses to a poll asking for ratings on different national cuisines, along with demographic data from the respondents.   
+* [The "Food World Cup" data set](https://github.com/fivethirtyeight/data/tree/master/food-world-cup) includes responses to a poll asking for ratings on different national cuisines, along with demographic data from the respondents.   
 
-* The "Yelp Fusion API" (<https://www.yelp.com/developers/documentation/v3>), which provides a restaurant search capability based on various query terms (including key words and location).
+* [The "Yelp Fusion API"](https://www.yelp.com/developers/documentation/v3) provides a restaurant search capability based on various query terms (including key words and location).
+
 
 ### Project deliverable
 
